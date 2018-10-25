@@ -59,28 +59,29 @@ app.get('/callback', (req, res) => {
       }
       return axios.get(`https://${process.env.REACT_APP_AUTH0_DOMAIN}/api/v2/users/${req.session.user.sub}`, options)
     };
-    
+
     function setGitTokenToSession(gitHubAccessTokenResponse){
-      const githubIdentity = gitHubAccessTokenResponse.data.identities[0].access_token;
+      const githubIdentity = gitHubAccessTokenResponse.data.identities[0];
       req.session.gitHubAccessToken = githubIdentity.access_token;
       res.redirect('/');
     };
 
 });
 
-app.put('api/star', (req, res) => {
-  const {gitUser, gitRepo} = req.query;
-  axios.put(`https://api.github.com/user/starred/${gitUser}/${gitRepo}?access_token=${req.session.gitHubAccessToken}`)
-  .then(()=> res.end())
-  .catch(error => console.log('error starring repo', error))
-})
+app.put('/api/star', (req, res) => {
+  const { gitUser, gitRepo } = req.query;
+  axios.put(`https://api.github.com/user/starred/${gitUser}/${gitRepo}?access_token=${req.session.gitHubAccessToken}`).then(() => {
+    res.end();
+  }).catch(err => console.log('Error starring repo', err));
+});
 
-app.delete('api/star', (req, res) => {
-  const {gitUser, gitRepo} = req.query;
-  axios.delete(`https://api.github.com/user/starred/${gitUser}/${gitRepo}?access_token=${req.session.gitHubAccessToken}`)
-  .then(() => res.end())
-  .catch(error => console.log('error unstarring repo', error))
-})
+app.delete('/api/star', (req, res) => {
+  const { gitUser, gitRepo } = req.query;
+  axios.delete(`https://api.github.com/user/starred/${gitUser}/${gitRepo}?access_token=${req.session.gitHubAccessToken}`).then(() => {
+    res.end()
+  }).catch(err => console.log('Error unstarring repo', err));
+});
+
 
 app.get('/api/user-data', (req, res) => {
   res.status(200).json(req.session.user)
